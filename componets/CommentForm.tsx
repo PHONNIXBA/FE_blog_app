@@ -19,7 +19,7 @@ export function CommentForm({postId}: Props) {
         setContent("");
     }
     return (
-        <form onSubmit={Submit} className="mt-4 flex-gap-2">
+        <form onSubmit={Submit} className="mt-4 flex gap-2">
             <textarea
                 value={content}
                 onChange={(e) => setContent(e.target.value)}

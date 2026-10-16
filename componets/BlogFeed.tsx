@@ -1,6 +1,5 @@
 "use client";
 
-import { CreateNewPostForm } from "./CreateNewPostForm";
 import { PostList } from "./PostList";
 import { usePosts } from "./PostState";
 

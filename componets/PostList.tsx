@@ -1,15 +1,5 @@
 import { PostCard } from "./PostCard";
-import type { Comment } from "@/data/posts";
-
-type Post = {
-  id: string;
-  author: string;
-  title: string;
-  description: string;
-  like: number;
-  liked: boolean;
-  comment: Comment[]
-};
+import type { Post } from "@/data/posts";
 
 interface Props {
   posts: Post[];

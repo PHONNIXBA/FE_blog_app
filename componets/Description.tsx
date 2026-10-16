@@ -12,10 +12,11 @@ export function Description({description}: Props) {
   const maxLength = 120;
   const isLong = description.length > maxLength;
 
-  const visibleText =
-    isLong && !expanded
-      ? description.slice(0, maxLength) + "..."
-      : description;
+  let visibleText = description;
+
+  if ((isLong) && !expanded) {
+    visibleText = description.slice(0, maxLength) + "...";
+  }
 
   return (
     <div className="mt-2">

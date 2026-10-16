@@ -26,33 +26,36 @@ const PostsContext = createContext<PostContextType | undefined>(undefined);
 export function PostState({children}: {children: ReactNode}) {
     const [posts, setPosts] = useState<Post[]>(initialPosts);
     function LikePost(postId: string) {
-        setPosts((posts) => 
-            posts.map((post) => 
-                post.id === postId ? {
-                    ...post,
-                    like: post.liked ? post.like - 1 : post.like + 1,
-                    liked: !post.liked,
-                }: post
-            )
-        );
+        const post = posts.find(post => post.id === postId);
+        if (!post) {
+            return;
+        }
+
+        if (post.liked) {
+            post.like -= 1;
+        } else {
+            post.like += 1;
+        }
+
+        post.liked = !post.liked;
+        setPosts([...posts]);
     }
+
     function AddComment(postId: string, content: string) {
+        const post = posts.find(post => post.id === postId);
+        if (!post) {
+            return;
+        }
+        
         const newComment = {
             author: "You",
             content: content
         }
-        setPosts((posts) => 
-            posts.map((post) => 
-                post.id === postId ? {
-                    ...post,
-                    comment: [
-                        ...post.comment,
-                        newComment
-                    ]
-                }: post
-            )
-        )
+        
+        post.comment.push(newComment);
+        setPosts([...posts]);
     }
+
     function createNewPost(
         author: string,
         title: string,
@@ -69,6 +72,7 @@ export function PostState({children}: {children: ReactNode}) {
         }
         setPosts((posts) => [newPost, ...posts]);
     }
+    
     return (
         <PostsContext.Provider
             value={{

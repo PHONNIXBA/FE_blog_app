@@ -2,7 +2,6 @@
 
 import React, { useState } from "react";
 import { usePosts } from "./PostState";
-import type { FormEvent } from "react";
 import { useRouter } from "next/navigation";
 
 export function CreateNewPostForm() {
