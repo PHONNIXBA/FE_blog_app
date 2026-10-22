@@ -3,73 +3,99 @@
 import {
     createContext,
     useContext,
-    useState
+    useState,
+    useEffect
 } from "react";
 
 import type { ReactNode } from "react";
 import type { Post } from "@/data/posts";
-import { posts as initialPosts } from "@/data/posts";
 
 type PostContextType = {
     posts: Post[]
-    LikePost: (postId: string) => void;
-    AddComment: (postId: string, content: string) => void;
+    LikePost: (postId: string) => Promise<void>;
+    AddComment: (postId: string, content: string) => Promise<void>;
     createNewPost: (
         author: string,
         title: string,
         description: string
-    ) => void;
+    ) => Promise<void>;
 }
 
 const PostsContext = createContext<PostContextType | undefined>(undefined);
 
 export function PostState({children}: {children: ReactNode}) {
-    const [posts, setPosts] = useState<Post[]>(initialPosts);
-    function LikePost(postId: string) {
-        const post = posts.find(post => post.id === postId);
-        if (!post) {
+    const [posts, setPosts] = useState<Post[]>([]);
+
+    async function getPosts() {
+        const respone = await fetch("http://localhost:3001/post");
+        const data = await respone.json();
+        console.log("Received posts: ", data);
+        setPosts(data);
+    }
+
+    useEffect(() => {
+        getPosts();
+    }, []);
+
+    async function LikePost(postId: string) {
+        const response = await fetch(`http://localhost:3001/post/${postId}/like`,
+            { method: "PUT" }
+        );
+        if (!response.ok) {
+            alert("Failed to like post");
             return;
         }
 
-        if (post.liked) {
-            post.like -= 1;
-        } else {
-            post.like += 1;
-        }
-
-        post.liked = !post.liked;
-        setPosts([...posts]);
+        const updatePost: Post = await response.json();
+        setPosts(currentPost => 
+            currentPost.map((post) => {
+                if (post.id === postId) {
+                    return updatePost;
+                }
+                return post;
+            })
+        );
     }
 
-    function AddComment(postId: string, content: string) {
-        const post = posts.find(post => post.id === postId);
-        if (!post) {
-            return;
+    async function AddComment(postId: string, content: string) {
+        const response = await fetch(`http://localhost:3001/post/${postId}/comment`,
+            { 
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({
+                    author: "You",
+                    content: content
+                })
+            }
+        );
+
+        if (!response.ok) {
+            alert("Failed to comment post");
         }
-        
-        const newComment = {
-            author: "You",
-            content: content
-        }
-        
-        post.comment.push(newComment);
-        setPosts([...posts]);
+
+        await getPosts();
     }
 
-    function createNewPost(
+    async function createNewPost(
         author: string,
         title: string,
         description: string
     ) {
-        const newPost: Post = {
-            id: crypto.randomUUID(),
-            author,
-            title,
-            description,
-            like: 0,
-            liked: false,
-            comment: []
+        const response = await fetch("http://localhost:3001/post", {
+            method: "POST",
+            headers: { "Content-Type": "application/json"},
+            body: JSON.stringify({
+                author: author,
+                title: title,
+                description: description
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error("Failed to create post");
         }
+
+        const newPost: Post = await response.json();
         setPosts((posts) => [newPost, ...posts]);
     }
     

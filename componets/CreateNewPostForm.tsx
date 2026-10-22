@@ -10,13 +10,22 @@ export function CreateNewPostForm() {
     const [description, setDescription] = useState("");
     const {createNewPost} = usePosts();
     const router = useRouter();
-    function Submit(event: React.FormEvent<HTMLFormElement>) {
+
+    async function Submit(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault();
+
         if (!author.trim() || !title.trim() || !description.trim()) {
             return;
         }
-        createNewPost(author.trim(), title.trim(), description.trim());
-        router.push("/");
+
+        try {
+            await createNewPost(author.trim(), title.trim(), description.trim());
+            router.push("/");
+        } catch (error) {
+            console.error(error);
+            alert("Failed to create post");
+        }
+        
     }
     return (
         <form onSubmit={Submit} className="mb-6 rouned-xl bg-white p-4 shadow-sm">

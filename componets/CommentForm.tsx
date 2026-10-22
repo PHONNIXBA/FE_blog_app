@@ -10,13 +10,20 @@ interface Props {
 export function CommentForm({postId}: Props) {
     const [content, setContent] = useState("");
     const {AddComment} = usePosts();
-    function Submit(event: React.FormEvent<HTMLFormElement>) {
+    async function Submit(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault();
+
         if (!content.trim()) {
             return;
         }
-        AddComment(postId, content);
-        setContent("");
+
+        try {
+            await AddComment(postId, content);
+            setContent("");
+        } catch (error) {
+            console.error(error);
+            alert("Failed to add comment");
+        }
     }
     return (
         <form onSubmit={Submit} className="mt-4 flex gap-2">

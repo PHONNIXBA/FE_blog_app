@@ -23,7 +23,7 @@ export function PostCard({
 }: Props) {
     return (
         <article className="w-full rounded-xl border bg-white p-4 shadow-sm">
-            <Link href={`/posts/${id}`}>
+            <Link href={`/post/${id}`}>
                 <h2 className="font-semibold">{author}</h2>
                 <h3 className="mt-2 text-lg font-bold">{title}</h3>
             </Link>
